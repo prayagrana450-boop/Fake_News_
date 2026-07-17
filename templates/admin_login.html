@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Login - Fake News Detection{% endblock %}
+
+{% block content %}
+<section class="card">
+
+    <h2>Admin Login</h2>
+
+    <form method="POST" action="{{ url_for('admin_login.admin_login') }}">
+
+        <label class="label">Email Address</label>
+        <input
+            class="input"
+            type="email"
+            name="email"
+            placeholder="Enter Admin Email"
+            autocomplete="email"
+            required
+        >
+
+        <label class="label">Password</label>
+        <input
+            class="input"
+            type="password"
+            name="password"
+            placeholder="Enter Password"
+            autocomplete="current-password"
+            required
+        >
+
+        <button class="btn" type="submit">
+            Login as Admin
+        </button>
+
+    </form>
+
+    <div class="muted" style="margin-top:15px;">
+        <a href="{{ url_for('admin_login.admin_register') }}">
+            Create Admin Account
+        </a>
+        |
+        <a href="{{ url_for('auth.login') }}">
+            User Login
+        </a>
+    </div>
+
+</section>
+{% endblock %}

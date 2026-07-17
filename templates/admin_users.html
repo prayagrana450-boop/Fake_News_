@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Users - Fake News Detection{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="card__header">
+    <h2>Users</h2>
+    <a class="btn btn--secondary" href="{{ url_for('admin.dashboard') }}">Back</a>
+  </div>
+
+  {% if rows %}
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Active</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rows %}
+            <tr>
+              <td>{{ r.id }}</td>
+              <td>{{ r.username }}</td>
+              <td>{{ r.email }}</td>
+              <td>{{ r.role }}</td>
+              <td>
+                {% if r.is_active|int == 1 %}
+                  <span class="badge badge--real">Active</span>
+                {% else %}
+                  <span class="badge badge--fake">Inactive</span>
+                {% endif %}
+              </td>
+              <td>{{ r.created_at }}</td>
+              <td>
+                {% if r.role != 'admin' %}
+                  <a class="btn btn--danger btn--sm" href="{{ url_for('admin.toggle_user', user_id=r.id) }}" onclick="return confirm('Toggle user active status?')">Toggle</a>
+                {% else %}
+                  <span class="muted">—</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="muted">No users found.</p>
+  {% endif %}
+</section>
+{% endblock %}
+

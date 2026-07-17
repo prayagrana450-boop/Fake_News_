@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Predict - Fake News Detection{% endblock %}
+{% block content %}
+<section class="card">
+  <h2>Make a prediction</h2>
+
+  <form method="post" action="{{ url_for('prediction.predict_ui') }}" enctype="multipart/form-data" class="form">
+    <label class="label">Text</label>
+    <textarea class="textarea" name="text" rows="7" placeholder="Paste news text here..."></textarea>
+
+    <div class="divider"></div>
+
+    <label class="label">Or upload a file (.txt, .csv, .json)</label>
+    <input class="input" type="file" name="file" accept=".txt,.csv,.json" />
+
+
+
+
+
+    <button class="btn" type="submit">Predict</button>
+
+  </form>
+
+  <div class="muted">
+    Your prediction history will appear in <a href="{{ url_for('prediction.history') }}">History</a>.
+  </div>
+</section>
+{% endblock %}
+

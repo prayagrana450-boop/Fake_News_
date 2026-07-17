@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Prediction Result - Fake News Detection{% endblock %}
+{% block content %}
+<section class="card">
+  <h2>Prediction result</h2>
+
+  <div class="result">
+    <div>
+      <div class="result__label">Prediction</div>
+      <div class="result__value">
+        <span class="badge badge--{{ 'fake' if result.prediction_label|lower == 'fake' else 'real' }}">
+          {{ result.prediction_label }}
+        </span>
+      </div>
+    </div>
+    <div>
+      <div class="result__label">Confidence</div>
+      <div class="result__value">
+        {{ "%.2f"|format(result.confidence) }}%
+      </div>
+    </div>
+    <div>
+      <div class="result__label">File name</div>
+      <div class="result__value">{{ input_filename or 'Manual text' }}</div>
+    </div>
+    <div>
+      <div class="result__label">Input type</div>
+      <div class="result__value">{{ input_type or 'TEXT' }}</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>Input preview</h3>
+  <pre class="pre">{{ input_text_preview }}</pre>
+
+  <div class="actions">
+    <a class="btn btn--secondary" href="{{ url_for('prediction.predict_ui') }}">Predict again</a>
+    <a class="btn btn--secondary" href="{{ url_for('prediction.history') }}">View history</a>
+  </div>
+</section>
+{% endblock %}
+

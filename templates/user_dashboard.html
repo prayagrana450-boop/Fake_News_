@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard - Fake News Detection{% endblock %}
+
+{% block content %}
+<section class="grid">
+  <div class="card">
+    <div class="d-flex align-items-center justify-content-between gap-3">
+      <div>
+        <h2 class="mb-1">Welcome</h2>
+        <div class="muted">{{ session.get('username') or 'User' }}</div>
+      </div>
+      <div class="actions">
+        <a class="btn btn--secondary" href="{{ url_for('prediction.predict_ui') }}">
+          <i class="fa-solid fa-bolt me-2"></i> New prediction
+        </a>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat__value">{{ stats.total }}</div>
+        <div class="stat__label">Total Predictions</div>
+      </div>
+      <div class="stat">
+        <div class="stat__value">{{ stats.fake_cnt }}</div>
+        <div class="stat__label">Fake News</div>
+      </div>
+      <div class="stat">
+        <div class="stat__value">{{ stats.real_cnt }}</div>
+        <div class="stat__label">Real News</div>
+      </div>
+      <div class="stat">
+        <div class="stat__value">
+          {# Average confidence is not currently provided by dashboard_routes.py.
+             Keep UI stable by showing 0.00% instead of breaking queries/routes. #}
+          0.00%
+        </div>
+        <div class="stat__label">Average Confidence</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card">
+    <h2 class="mb-2">Your performance</h2>
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-card__title">Prediction trend</div>
+        <div style="height: 240px;">
+          <canvas id="historyChart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-card__title">Fake vs Real</div>
+        <div style="height: 240px;">
+          <canvas id="pieChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    {# Expose chart data for static/js/charts.js (it looks for these globals). #}
+    <script>
+      window.__historyChartData = {{ chart | tojson }};
+      window.__pieChartData = {{ pie_chart | tojson }};
+    </script>
+  </div>
+</section>
+
+<section class="grid">
+  <div class="card">
+    <div class="card__header d-flex align-items-center justify-content-between gap-2">
+      <h2 class="mb-0">Recent predictions</h2>
+      <a class="btn btn--secondary" href="{{ url_for('prediction.history') }}">
+        View history
+      </a>
+    </div>
+
+    {% if history %}
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Prediction</th>
+              <th>Confidence %</th>
+              <th>Input Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in history %}
+              <tr>
+                <td>{{ r.created_at }}</td>
+                <td>
+                  <span class="badge badge--{{ 'fake' if r.prediction_label|lower == 'fake' else 'real' }}">
+                    {{ r.prediction_label }}
+                  </span>
+                </td>
+                <td>{{ "%.2f"|format(r.confidence) }}%</td>
+                <td>{{ 'PDF' if r.input_filename else 'Text' }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="muted">No predictions yet.</p>
+    {% endif %}
+
+    <div class="divider"></div>
+
+    <div class="actions">
+      <a class="btn" href="{{ url_for('prediction.predict_ui') }}">
+        <i class="fa-solid fa-file-arrow-up me-2"></i> Predict again
+      </a>
+      <a class="btn btn--danger" href="{{ url_for('auth.logout') }}">Logout</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="mb-2">Make a prediction</h2>
+    <div class="muted">Use the prediction page to upload PDF or paste text.</div>
+
+    <div class="divider"></div>
+
+    <div class="actions">
+      <a class="btn" href="{{ url_for('prediction.predict_ui') }}">
+        <i class="fa-solid fa-pen-to-square me-2"></i> Text prediction
+      </a>
+      <a class="btn btn--secondary" href="{{ url_for('prediction.predict_ui') }}">
+        <i class="fa-solid fa-file-pdf me-2"></i> PDF upload
+      </a>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>User profile summary</h3>
+    <div class="profile-summary">
+      <div class="profile-summary__row"><span class="muted">Total users</span><strong>{{ total_users }}</strong></div>
+      <div class="profile-summary__row"><span class="muted">Dataset size</span><strong>{{ dataset_total }}</strong></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>Tip</h3>
+    <div class="muted">
+      After you predict, view the latest result and confidence percentage on the prediction result page.
+    </div>
+  </div>
+</section>
+{% endblock %}
+

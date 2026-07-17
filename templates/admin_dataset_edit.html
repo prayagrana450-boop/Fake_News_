@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Edit Dataset - Fake News Detection{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="card__header">
+    <h2>Edit dataset entry</h2>
+    <a class="btn btn--secondary" href="{{ url_for('admin.datasets') }}">Back</a>
+  </div>
+
+  <form method="post" action="{{ url_for('admin.edit_dataset', dataset_id=row.id) }}" class="form">
+    <label class="label">Text</label>
+    <textarea class="textarea" name="text" rows="6" required>{{ row.text }}</textarea>
+
+    <label class="label">Label (real/fake)</label>
+    <select class="input" name="label" required>
+      <option value="real" {% if row.label=='real' %}selected{% endif %}>real</option>
+      <option value="fake" {% if row.label=='fake' %}selected{% endif %}>fake</option>
+    </select>
+
+    <button class="btn" type="submit">Update</button>
+  </form>
+</section>
+{% endblock %}
+

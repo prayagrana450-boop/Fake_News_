@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Registration - Fake News Detection{% endblock %}
+
+{% block content %}
+<section class="card">
+
+    <h2>Admin Registration</h2>
+
+    <form method="POST" action="{{ url_for('admin_login.admin_register') }}">
+
+        <!-- Username -->
+        <label class="label">Username</label>
+        <input
+            class="input"
+            type="text"
+            name="username"
+            placeholder="Enter Username"
+            autocomplete="username"
+            required
+        >
+
+        <!-- Email -->
+        <label class="label">Email Address</label>
+        <input
+            class="input"
+            type="email"
+            name="email"
+            placeholder="Enter Email Address"
+            autocomplete="email"
+            required
+        >
+
+        <!-- Password -->
+        <label class="label">Password</label>
+        <input
+            class="input"
+            type="password"
+            name="password"
+            placeholder="Enter Password"
+            autocomplete="new-password"
+            required
+        >
+
+        <!-- Confirm Password -->
+        <label class="label">Confirm Password</label>
+        <input
+            class="input"
+            type="password"
+            name="confirm_password"
+            placeholder="Confirm Password"
+            autocomplete="new-password"
+            required
+        >
+
+        <button type="submit" class="btn">
+            Register Admin
+        </button>
+
+    </form>
+
+    <div class="muted mt-3">
+        Already have an account?
+        <a href="{{ url_for('admin_login.admin_login') }}">
+            Admin Login
+        </a>
+    </div>
+
+</section>
+{% endblock %}

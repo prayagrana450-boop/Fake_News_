@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Fake News Detection{% endblock %}
+
+{% block content %}
+<section class="card">
+  <h2>AI Fake News Detection</h2>
+  <p class="muted">
+    Detect fake news with machine learning. Analyze text and get a prediction with confidence.
+  </p>
+
+  <div class="actions">
+    <a class="btn" href="{{ url_for('prediction.predict_ui') }}">
+      <i class="fa-solid fa-bolt me-2"></i> Predict News
+    </a>
+  </div>
+
+  <div class="divider"></div>
+
+  {% if session.get('is_admin') %}
+    <div class="muted">Welcome, Admin</div>
+    <h3 style="margin-top:8px;">{{ session.get('admin_name') or 'Admin' }}</h3>
+
+
+    <div class="divider"></div>
+
+    <div class="actions">
+      <span class="badge badge--real">Admin</span>
+      <a class="btn btn--secondary" href="{{ url_for('admin.dashboard') }}">Admin Dashboard</a>
+      <a class="btn btn--danger" href="{{ url_for('admin_login.admin_logout') }}">Logout</a>
+    </div>
+
+  {% elif session.get('user_id') %}
+    <div class="muted">Welcome</div>
+    <h3 style="margin-top:8px;">{{ session.get('username') or 'User' }}</h3>
+
+    <div class="divider"></div>
+
+    <div class="actions">
+      <span class="badge badge--fake">User</span>
+      <a class="btn btn--secondary" href="{{ url_for('auth.profile') }}">Profile</a>
+      <a class="btn btn--danger" href="{{ url_for('auth.logout') }}">Logout</a>
+    </div>
+
+  {% else %}
+    <h3>User</h3>
+    <div class="actions">
+      <a class="btn btn--secondary" href="{{ url_for('auth.login') }}">
+        <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Login
+      </a>
+
+      <a class="btn btn--secondary" href="{{ url_for('auth.register') }}">
+        <i class="fa-solid fa-user-plus me-2"></i> Register
+      </a>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>Admin</h3>
+    <div class="actions">
+      <a class="btn btn--secondary" href="{{ url_for('admin_login.admin_login') }}">
+        <i class="fa-solid fa-user-shield me-2"></i> Admin Login
+      </a>
+      <a class="btn btn--secondary" href="{{ url_for('admin_login.admin_register') }}">
+        <i class="fa-solid fa-user-plus me-2"></i> Admin Register
+      </a>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}
+
+
+

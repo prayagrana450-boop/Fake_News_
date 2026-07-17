@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block title %}Admin - Fake News Detection{% endblock %}
+{% block content %}
+<section class="grid">
+  <div class="card">
+    <h2>Admin overview</h2>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat__value">{{ users_cnt }}</div>
+        <div class="stat__label">Users</div>
+      </div>
+      <div class="stat">
+        <div class="stat__value">{{ predictions_cnt }}</div>
+        <div class="stat__label">Total predictions</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Distribution</h2>
+    {% if dist %}
+      <div class="dist">
+        {% for row in dist %}
+          <div class="dist__row">
+            <span>{{ row.prediction_label }}</span>
+            <strong>{{ row.cnt }}</strong>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="muted">No predictions yet.</p>
+    {% endif %}
+  </div>
+</section>
+
+<section class="grid">
+  <div class="card">
+    <h2>Recent users</h2>
+    {% if recent_users %}
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in recent_users %}
+              <tr>
+                <td>{{ u.id }}</td>
+                <td>{{ u.username }}</td>
+                <td>{{ u.email }}</td>
+                <td>{{ u.role }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="actions">
+        <a class="btn btn--secondary" href="{{ url_for('admin.users') }}">All users</a>
+      </div>
+    {% else %}
+      <p class="muted">No users found.</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2>Reports snapshot</h2>
+    <div class="dist">
+      <div class="dist__title">Avg confidence by label</div>
+      {% if reports.distribution %}
+        {% for r in reports.distribution %}
+          <div class="dist__row">
+            <span>{{ r.prediction_label }}</span>
+            <span class="muted">Avg:</span>
+            {# Avg confidence stored either as 0..1 or 0..100. Convert to percent once and format to 2 decimals. #}
+            {% set _avg = (r.avg_confidence if r.avg_confidence is not none else 0) %}
+            {% set _pct = (_avg * 100 if _avg <= 1 else _avg) %}
+            <strong>{{ '%.2f'|format(_pct) }}%</strong>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="muted">No report data.</p>
+      {% endif %}
+    </div>
+
+    <div class="divider"></div>
+
+    <h2>Admin actions</h2>
+    <div class="actions">
+      <a class="btn" href="{{ url_for('admin.datasets') }}">Manage datasets</a>
+      <a class="btn" href="{{ url_for('admin.predictions') }}">View predictions</a>
+    </div>
+
+    <form method="post" action="{{ url_for('admin.retrain') }}" onsubmit="return confirm('Retrain ML model from dataset table? This may take a while.')">
+      <button class="btn btn--danger" type="submit">Retrain model</button>
+    </form>
+  </div>
+</section>
+{% endblock %}
+

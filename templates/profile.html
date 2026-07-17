@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Profile - Fake News Detection{% endblock %}
+{% block content %}
+<section class="card">
+  <h2>Your profile</h2>
+
+  <form method="post" action="{{ url_for('auth.update_profile') }}" class="form">
+    <label class="label">Username</label>
+    <input class="input" name="username" type="text" value="{{ user.username }}" required />
+
+    <label class="label">Email</label>
+    <input class="input" name="email" type="email" value="{{ user.email }}" required />
+
+    <button class="btn" type="submit">Save changes</button>
+  </form>
+</section>
+{% endblock %}
+

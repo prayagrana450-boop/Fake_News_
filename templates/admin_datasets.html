@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Datasets - Fake News Detection{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="card__header">
+    <h2>Datasets</h2>
+    <a class="btn btn--secondary" href="{{ url_for('admin.dashboard') }}">Back to admin</a>
+  </div>
+
+  <form method="get" class="search" action="{{ url_for('admin.datasets') }}">
+    <input class="input" type="text" name="q" value="{{ q }}" placeholder="Search by text/label..." />
+    <button class="btn btn--secondary" type="submit">Search</button>
+  </form>
+
+  <div class="divider"></div>
+
+  <h3>Add entry</h3>
+  <form method="post" action="{{ url_for('admin.datasets') }}" class="form">
+    <label class="label">Text</label>
+    <textarea class="textarea" name="text" rows="4" required></textarea>
+
+    <label class="label">Label (real/fake)</label>
+    <select class="input" name="label" required>
+      <option value="real">real</option>
+      <option value="fake">fake</option>
+    </select>
+
+    <button class="btn" type="submit">Add</button>
+  </form>
+
+  <div class="divider"></div>
+
+  <h3>Existing entries</h3>
+  {% if rows %}
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Label</th>
+            <th>Text</th>
+            <th>Date</th>
+            <th>Created By</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in rows %}
+            <tr>
+              <td>{{ row.id }}</td>
+              <td><span class="badge badge--{{ 'fake' if row.label=='fake' else 'real' }}">{{ row.label }}</span></td>
+              <td><span class="truncate">{{ row.text }}</span></td>
+              <td>{{ row.created_at }}</td>
+              <td>{{ row.created_by if row.created_by is not none else '-' }}</td>
+              <td>
+                <a class="btn btn--secondary btn--sm" href="{{ url_for('admin.edit_dataset', dataset_id=row.id) }}">Edit</a>
+                <a class="btn btn--danger btn--sm" href="{{ url_for('admin.delete_dataset', dataset_id=row.id) }}" onclick="return confirm('Delete this dataset entry?')">Delete</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      {% if page > 1 %}
+        <a class="page-link" href="{{ url_for('admin.datasets', page=page-1, q=q) }}">Prev</a>
+      {% endif %}
+      <span class="muted">Page {{ page }} of {{ total_pages }}</span>
+      {% if page < total_pages %}
+        <a class="page-link" href="{{ url_for('admin.datasets', page=page+1, q=q) }}">Next</a>
+      {% endif %}
+    </div>
+  {% else %}
+    <p class="muted">No dataset entries.</p>
+  {% endif %}
+</section>
+{% endblock %}
+

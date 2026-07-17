@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}History - Fake News Detection{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="card__header">
+    <h2>Prediction history</h2>
+    <a class="btn btn--secondary" href="{{ url_for('prediction.predict_ui') }}">New prediction</a>
+  </div>
+
+  {% if rows %}
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Label</th>
+            <th>Confidence</th>
+            <th>Date</th>
+            <th>File</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rows %}
+            <tr>
+              <td>{{ r.id }}</td>
+              <td>
+                <span class="badge badge--{{ 'fake' if r.prediction_label|lower == 'fake' else 'real' }}">{{ r.prediction_label }}</span>
+              </td>
+              <td>{{ "%.2f"|format(r.confidence) }}%</td>
+              <td>{{ r.created_at }}</td>
+              <td>{{ r.input_filename or '-' }}</td>
+              <td>
+                <a class="btn btn--danger btn--sm" href="{{ url_for('prediction.delete_history', pred_id=r.id) }}" onclick="return confirm('Delete this prediction?')">Delete</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      {% if page > 1 %}
+        <a class="page-link" href="{{ url_for('prediction.history', page=page-1) }}">Prev</a>
+      {% endif %}
+      <span class="muted">Page {{ page }} of {{ total_pages }}</span>
+      {% if page < total_pages %}
+        <a class="page-link" href="{{ url_for('prediction.history', page=page+1) }}">Next</a>
+      {% endif %}
+    </div>
+  {% else %}
+    <p class="muted">No predictions yet.</p>
+  {% endif %}
+</section>
+{% endblock %}
+
