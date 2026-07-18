@@ -89,35 +89,49 @@ def predict_ui():
             flash("Please provide text or upload a file.", "danger")
             return redirect(url_for("prediction.predict_ui"))
 
-        predictor = get_predictor()
-        result = predictor.predict(text)
+        import logging
+        import traceback
 
-        # Save prediction history with confidence
-        # (Use extracted text as input_text; store input_filename as uploaded name)
-        # Note: existing DB schema is respected (no new tables/routes).
+        try:
+            predictor = get_predictor()
+            result = predictor.predict(text)
 
-        db = get_db()
-        cur = db.cursor()
-        cur.execute(
-            "INSERT INTO prediction_history (user_id, input_text, input_filename, prediction_label, confidence) VALUES (%s,%s,%s,%s,%s)",
-            (
-                session["user_id"],
-                text,
-                input_filename,
-                result["prediction_label"],
-                result["confidence"],
-            ),
-        )
-        db.commit()
-        cur.close()
+            # Save prediction history with confidence
+            # (Use extracted text as input_text; store input_filename as uploaded name)
+            # Note: existing DB schema is respected (no new tables/routes).
+            db = get_db()
+            cur = db.cursor()
+            cur.execute(
+                "INSERT INTO prediction_history (user_id, input_text, input_filename, prediction_label, confidence) VALUES (%s,%s,%s,%s,%s)",
+                (
+                    session["user_id"],
+                    text,
+                    input_filename,
+                    result["prediction_label"],
+                    result["confidence"],
+                ),
+            )
+            db.commit()
+            cur.close()
 
-        return render_template(
-            "prediction_result.html",
-            result=result,
-            input_text_preview=text[:800],
-            input_filename=input_filename,
-            input_type=input_type if uploaded and uploaded.filename else "TEXT",
-        )
+            return render_template(
+                "prediction_result.html",
+                result=result,
+                input_text_preview=text[:800],
+                input_filename=input_filename,
+                input_type=input_type if uploaded and uploaded.filename else "TEXT",
+            )
+
+        except Exception as e:
+            # Full traceback logging (Render-friendly)
+            tb = traceback.format_exc()
+            logging.getLogger(__name__).error("Prediction failed: %s\n%s", e, tb)
+            print("[ERROR] Prediction failed:")
+            print(tb)
+
+            flash("Prediction failed on the server. Please try again.", "danger")
+            return redirect(url_for("prediction.predict_ui"))
+
 
     return render_template("prediction.html")
 
