@@ -88,15 +88,44 @@ class Predictor:
         self.vectorizer = joblib.load(vectorizer_path)
 
         # Ensure stopwords/lemmatizer resources are available.
-        # If missing, fail with actionable message.
+        # On Render/production, automatically download missing NLTK data (first startup)
+        # instead of crashing.
         try:
+            # Store NLTK data under project-local directory so it can persist in Render.
+            # (If directory isn't writable on a given platform, nltk will fallback.)
+            try:
+                nltk.data.path.append(str(Path("nltk_data")))
+            except Exception:
+                pass
+
+            required_resources = [
+                "stopwords",
+                "punkt",
+                "wordnet",
+                "omw-1.4",
+            ]
+
+            for res in required_resources:
+                try:
+                    nltk.data.find(f"corpora/{res}")
+                except LookupError:
+                    nltk.download(res, quiet=True)
+
             self.stop_words = set(stopwords.words("english"))
             self.lemmatizer = WordNetLemmatizer()
-        except LookupError as e:
-            raise RuntimeError(
-                "NLTK resources are missing. Run: python train_model.py "
-                "(it downloads required NLTK data) or download NLTK resources manually."
-            ) from e
+
+        except Exception as e:
+            # Never crash the whole app due to NLTK.
+            # Fall back to no stopword filtering.
+            self.stop_words = set()
+            self.lemmatizer = WordNetLemmatizer()
+            import logging
+
+            logging.getLogger(__name__).warning(
+                "NLTK initialization failed; continuing with fallback. Error: %s",
+                e,
+            )
+
 
         metadata_file = self.models_dir / "metadata.json"
         if metadata_file.exists():
