@@ -70,19 +70,25 @@ app = create_app()
 
 
 if __name__ == "__main__":
-    # Ensure ML artifacts exist; warn but don't crash hard
+
     model_files = [
         Path(Config.MODELS_FOLDER) / "model.pkl",
         Path(Config.MODELS_FOLDER) / "vectorizer.pkl",
         Path(Config.MODELS_FOLDER) / "metadata.json",
     ]
+
     missing = [str(p) for p in model_files if not p.exists()]
+
     if missing:
-        print("[WARN] ML artifacts missing. Run: python train_model.py")
+        print("[WARN] ML artifacts missing:")
+        for file in missing:
+            print(file)
+
+    port = int(os.environ.get("PORT", 10000))
 
     app.run(
-        host=app.config["HOST"],
-        port=app.config["PORT"],
-        debug=app.config["DEBUG"],
+        host="0.0.0.0",
+        port=port,
+        debug=False,
     )
 
